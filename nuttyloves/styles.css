@@ -1,0 +1,38 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+    header {
+        background-color: #b30000;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+    }
+    nav {
+        background-color: #006400;
+        padding: 0.5rem;
+        text-align: center;
+    }
+    nav a {
+        color: white;
+        margin: 0 15px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .product, .inventory-item {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 1rem;
+        background: #fff;
+    }
+    .product button {
+        background-color: #b30000;
+        color: white;
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+</style>
