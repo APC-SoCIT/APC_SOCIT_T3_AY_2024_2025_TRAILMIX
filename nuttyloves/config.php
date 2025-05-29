@@ -1,5 +1,4 @@
 <?php
-// config.php - Database configuration
 $host = 'localhost';
 $db = 'nuttyloves_db';
 $user = 'root';

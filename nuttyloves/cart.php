@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
 include 'config.php';
 ?>
 <!DOCTYPE html>
@@ -21,13 +25,28 @@ include 'config.php';
       text-align: center;
       color: white;
     }
-    nav {
-      background-color: #c62828;
-      display: flex;
-      justify-content: center;
-      padding: 10px;
-    }
-    nav a {
+	nav {
+	  background-color: #c62828;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  padding: 10px;
+	  position: relative;
+	}
+
+	.nav-center {
+	  display: flex;
+	  gap: 15px;
+	}
+
+	.nav-right {
+	  position: absolute;
+	  right: 15px;
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	}
+		nav a {
       color: white;
       margin: 0 15px;
       text-decoration: none;
@@ -99,15 +118,26 @@ include 'config.php';
 </header>
 
 <nav>
-  <a href="index.php">Home</a>
-  <a href="products.php">Shop</a>
-  <a href="cart.php">Cart</a>
-  <a href="login.php">Login</a>
+  <div class="nav-center">
+    <a href="index.php">Home</a>
+    <a href="shop.php">Shop</a>
+    <a href="cart.php">Cart</a>
+  </div>
+  <div class="nav-right">
+    <?php if (isset($_SESSION['user'])): ?>
+      <span style="color: white; margin-right: 15px;">
+        Welcome, <?= htmlspecialchars($_SESSION['user']['Name']) ?>
+      </span>
+      <a href="logout.php">Logout</a>
+    <?php else: ?>
+      <a href="login.php">Login</a>
+    <?php endif; ?>
+  </div>
 </nav>
 
 <div class="container">
   <h2>Your Shopping Cart</h2>
-  <a href="index.php" class="btn">← Continue Shopping</a>
+  <a href="shop.php" class="btn">← Continue Shopping</a>
 
   <?php
   if (empty($_SESSION['cart'])) {
@@ -151,11 +181,21 @@ include 'config.php';
   }
   ?>
 </div>
-<form action="checkout.php" method="post">
+<?php if (isset($_SESSION['user'])): ?>
+  <form action="checkout.php" method="post">
+    <div style="text-align: center; margin-top: 20px;">
+      <button type="submit" class="btn">🛒 Checkout Now</button>
+    </div>
+  </form>
+<?php else: ?>
   <div style="text-align: center; margin-top: 20px;">
-    <button type="submit" class="btn">🛒 Checkout Now</button>
+    <p><strong>Please log in to proceed with checkout.</strong></p>
+    <a href="login.php" class="btn">🔐 Login to Checkout</a>
   </div>
-</form>
+<?php endif; ?>
+
+
+
 <footer>
   &copy; <?= date('Y') ?> NuttyLoves. All rights reserved.
 </footer>

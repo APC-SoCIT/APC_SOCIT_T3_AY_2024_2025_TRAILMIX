@@ -2,36 +2,39 @@
 session_start();
 include 'config.php';
 
+$success = '';
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $pass = $_POST['password'];
+    $name     = trim($_POST['name']);
+    $email    = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $address  = trim($_POST['address']);
 
-    $stmt = $conn->prepare("SELECT * FROM customers WHERE Email=? AND Password=?");
-    $stmt->bind_param("ss", $email, $pass);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $check = $conn->prepare("SELECT * FROM customers WHERE Email = ?");
+    $check->bind_param("s", $email);
+    $check->execute();
+    $result = $check->get_result();
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        $_SESSION['user'] = $user;
-
-        if ($user['Role'] === 'admin') {
-            header('Location: admin_dashboard.php');
-        } else {
-            header('Location: index.php');
-        }
-        exit();
+    if ($result->num_rows > 0) {
+        $error = "Email is already registered.";
     } else {
-        $error = "Invalid email or password.";
+        $stmt = $conn->prepare("INSERT INTO customers (Name, Email, Password, Address) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $name, $email, $password, $address);
+        if ($stmt->execute()) {
+            $success = "Account created successfully. Redirecting to login...";
+            header("refresh:2;url=login.php");
+        } else {
+            $error = "Registration failed. Please try again.";
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - NuttyLoves</title>
+    <title>Register - NuttyLoves</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -46,27 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             color: white;
         }
-	nav {
-	  background-color: #c62828;
-	  display: flex;
-	  justify-content: center;
-	  align-items: center;
-	  padding: 10px;
-	  position: relative;
-	}
-
-	.nav-center {
-	  display: flex;
-	  gap: 15px;
-	}
-
-	.nav-right {
-	  position: absolute;
-	  right: 15px;
-	  display: flex;
-	  align-items: center;
-	  gap: 10px;
-	}
+        nav {
+            background-color: #c62828;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
         nav a {
             color: white;
             margin: 0 15px;
@@ -76,15 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         nav a:hover {
             text-decoration: underline;
         }
-        .login-container {
-            max-width: 400px;
+        .register-container {
+            max-width: 500px;
             margin: 40px auto;
             padding: 30px;
             background-color: #f5f5f5;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .login-container h2 {
+        .register-container h2 {
             text-align: center;
             color: #2e7d32;
         }
@@ -96,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         label {
             font-weight: bold;
         }
-        input[type=email], input[type=password] {
+        input, textarea {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -113,9 +101,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         button:hover {
             background-color: #b71c1c;
         }
-        .error {
-            color: red;
+        .message {
             text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .message.success {
+            color: #2e7d32;
+        }
+        .message.error {
+            color: #c62828;
         }
         footer {
             text-align: center;
@@ -134,42 +129,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </header>
 
 <nav>
-  <div class="nav-center">
     <a href="index.php">Home</a>
     <a href="shop.php">Shop</a>
     <a href="cart.php">Cart</a>
-  </div>
-  <div class="nav-right">
-    <?php if (isset($_SESSION['user'])): ?>
-      <span style="color: white; margin-right: 15px;">
-        Welcome, <?= htmlspecialchars($_SESSION['user']['Name']) ?>
-      </span>
-      <a href="logout.php">Logout</a>
-    <?php else: ?>
-      <a href="login.php">Login</a>
-    <?php endif; ?>
-  </div>
+    <a href="login.php">Login</a>
 </nav>
 
-</nav>
-
-<div class="login-container">
-    <h2>Login</h2>
-    <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+<div class="register-container">
+    <h2>Create an Account</h2>
+    <?php
+    if ($success) echo "<p class='message success'>$success</p>";
+    if ($error) echo "<p class='message error'>$error</p>";
+    ?>
     <form method="post">
+        <label for="name">Full Name</label>
+        <input type="text" name="name" id="name" required>
+
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" name="email" id="email" required>
 
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" name="password" id="password" required>
 
-        <button type="submit">Login</button>
+        <label for="address">Address</label>
+        <textarea name="address" id="address" rows="3" required></textarea>
+
+        <button type="submit">Register</button>
     </form>
-
-    <div class="register-link" style="text-align:center; margin-top: 20px;">
-        <p>Don't have an account?</p>
-        <a href="register.php" style="background-color: #2e7d32; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Register Account</a>
-    </div>
 </div>
 
 <footer>

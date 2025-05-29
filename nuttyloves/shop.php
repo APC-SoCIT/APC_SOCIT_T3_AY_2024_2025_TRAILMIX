@@ -1,11 +1,12 @@
 <?php
 session_start();
+include 'config.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>NuttyLoves - Home</title>
+  <title>NuttyLoves - Shop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -52,16 +53,45 @@ session_start();
     }
     .container {
       padding: 30px;
-      max-width: 800px;
+      max-width: 1000px;
       margin: auto;
-      text-align: center;
     }
-    h2 {
+    .product {
+      border: 1px solid #eee;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 10px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+    }
+    .product img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 20px;
+    }
+    .product h3 {
+      margin: 0;
       color: #2e7d32;
     }
-    p {
-      line-height: 1.6;
-      font-size: 1.1em;
+    .product p {
+      margin: 5px 0;
+    }
+    .btn {
+      background-color: #c62828;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #b71c1c;
     }
     footer {
       text-align: center;
@@ -75,8 +105,8 @@ session_start();
 <body>
 
 <header>
-  <h1>Welcome to NuttyLoves</h1>
-  <p>Natural Goodness in Every Bite</p>
+  <h1>Shop NuttyLoves</h1>
+  <p>Browse our delicious, healthy mixes</p>
 </header>
 
 <nav>
@@ -97,11 +127,27 @@ session_start();
   </div>
 </nav>
 
-<div class="container">
-  <h2>About NuttyLoves</h2>
-  <p>NuttyLoves is your go-to destination for premium trail mixes packed with natural goodness. We believe in offering snacks that are not only delicious but also nutritious, using the finest selection of nuts, dried fruits, and seeds.</p>
-  <p>Browse our shop to find the perfect mix for your cravings and experience the joy of healthy snacking. From 8-in-1 blends to premium roasted cashews, we’ve got you covered.</p>
-  <p><a href="shop.php" class="btn">Start Shopping →</a></p>
+<div>
+  <?php
+  $sql = "SELECT * FROM products";         
+  $result = $conn->query($sql);             
+
+  if ($result->num_rows > 0) {              
+    while ($row = $result->fetch_assoc()) { 
+      echo '<div class="product">
+              <img src="images/nuttyloves' . $row['ProductID'] . '.jpg" alt="' . htmlspecialchars($row['Name']) . '">
+              <div>
+                <h3>' . htmlspecialchars($row['Name']) . '</h3>
+                <p>' . htmlspecialchars($row['Description']) . '</p>
+                <p><strong>₱' . number_format($row['Price'], 2) . '</strong></p>
+                <a href="add_to_cart.php?product_id=' . $row['ProductID'] . '" class="btn">Add to Cart</a>
+              </div>
+            </div>';
+    }
+  } else {
+    echo "<p>No products found.</p>";
+  }
+  ?>
 </div>
 
 <footer>
