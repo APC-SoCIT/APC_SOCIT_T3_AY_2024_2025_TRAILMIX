@@ -155,6 +155,8 @@ include 'config.php';
       $qty = $_SESSION['cart'][$row['ProductID']];
       $subtotal = $row['Price'] * $qty;
       $total += $subtotal;
+	  $tax = $total * 0.12;
+	  $grand_total = $total + $tax;
 
       echo "<tr>
               <td>{$row['Name']}</td>
@@ -172,10 +174,19 @@ include 'config.php';
     }
 
     echo "<tr>
-            <td colspan='3' class='total'>Total</td>
+            <td colspan='3' class='total'>Subtotal</td>
             <td class='total'>₱" . number_format($total, 2) . "</td>
           </tr>";
 		  
+	    echo "<tr>
+            <td colspan='3' class='total'>Tax (12%)</td>
+            <td class='total'>₱" . number_format($tax, 2) . "</td>
+          </tr>";
+		echo "<tr>
+            <td colspan='3' class='total'>Grand Total</td>
+            <td class='total'>₱" . number_format($grand_total, 2) . "</td>
+          </tr>";
+	
     echo "</table>";
 	
   }

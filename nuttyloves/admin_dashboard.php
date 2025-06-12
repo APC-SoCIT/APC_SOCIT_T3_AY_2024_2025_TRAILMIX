@@ -35,6 +35,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
   <a href="admin_manage_inventory.php">Inventory</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
+  <a href="admin_sales_chart.php">Reports</a>
+  <a href="admin_verify_users.php">Verify Users</a>
   <a href="logout.php">Logout</a>
 </nav>
 
@@ -44,7 +46,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
     <a href="admin_manage_products.php">Manage Products</a>
     <a href="admin_manage_inventory.php">Manage Inventory</a>
     <a href="admin_manage_orders.php">Manage Orders</a>
-    <a href="admin_view_sales.php">View Sales Reports</a>
+    <a href="admin_view_sales.php">View Sales List</a>
+	<a href="admin_sales_chart.php">View Sales Reports</a>
+	<a href="admin_verify_users.php">Verify Users</a>
   </div>
 </div>
 

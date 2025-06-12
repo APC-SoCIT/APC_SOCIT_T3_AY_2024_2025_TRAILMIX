@@ -41,6 +41,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
   <a href="admin_manage_inventory.php">Inventory</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
+  <a href="admin_sales_chart.php">Reports</a>
+  <a href="admin_verify_users.php">Verify Users</a>
   <a href="logout.php">Logout</a>
 </nav>
 

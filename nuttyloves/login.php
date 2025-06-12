@@ -6,7 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $pass = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM customers WHERE Email=? AND Password=?");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE Email=? AND Password=? AND Verified=1");
+	$error = "Account not verified yet. Please wait for admin approval.";
     $stmt->bind_param("ss", $email, $pass);
     $stmt->execute();
     $result = $stmt->get_result();

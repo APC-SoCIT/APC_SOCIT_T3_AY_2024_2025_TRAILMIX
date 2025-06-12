@@ -1,11 +1,60 @@
 <?php
 session_start();
 include 'config.php';
+
+require __DIR__ . '/phpmailer/src/Exception.php';
+require __DIR__ . '/phpmailer/src/PHPMailer.php';
+require __DIR__ . '/phpmailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 
+$lowStockItems = [];
+$query = "SELECT Name, StockQuantity FROM products";
+$result = $conn->query($query);
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        if ($row['StockQuantity'] < 5) {
+            $lowStockItems[] = "{$row['Name']} ({$row['StockQuantity']} left)";
+        }
+    }
+}
+
+if (!empty($lowStockItems)) {
+
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'francisconjd.csa@gmail.com'; 
+        $mail->Password = 'wyyh bgys pvhh nsqm';    
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+
+        $mail->setFrom('francisconjd@gmail.com', 'NuttyLoves');
+        $mail->addAddress('your-email@gmail.com', 'Admin');
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Low Stock Alert - NuttyLoves';
+        $mail->Body = "
+            <h3>Low Stock Notification</h3>
+            <p>The following products are low on stock (less than 5 units):</p>
+            <ul>" . implode('', array_map(fn($item) => "<li>$item</li>", $lowStockItems)) . "</ul>
+            <p>Please consider restocking soon.</p>
+        ";
+
+        $mail->send();
+    } catch (Exception $e) {
+        error_log("Low stock email failed: {$mail->ErrorInfo}");
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,6 +90,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
   <a href="admin_manage_inventory.php">Inventory</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
+  <a href="admin_sales_chart.php">Reports</a>
+  <a href="admin_verify_users.php">Verify Users</a>
   <a href="logout.php">Logout</a>
 </nav>
 

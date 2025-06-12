@@ -69,6 +69,8 @@ $items = $conn->query("SELECT p.Name, oi.Quantity, oi.Price
     <?php
     while ($row = $items->fetch_assoc()) {
       $subtotal = $row['Quantity'] * $row['Price'];
+	  $tax = $subtotal * 0.12;
+	  $grand_total = $subtotal + $tax;
       echo "<tr>
               <td>{$row['Name']}</td>
               <td>{$row['Quantity']}</td>
@@ -78,9 +80,17 @@ $items = $conn->query("SELECT p.Name, oi.Quantity, oi.Price
     }
     ?>
     <tr>
-      <td colspan="3"><strong>Total</strong></td>
+      <td colspan="3"><strong>Subtotal</strong></td>
       <td><strong>₱<?= number_format($order['TotalAmount'], 2) ?></strong></td>
     </tr>
+	<tr>
+	  <td colspan="3"><strong>Tax (12%)</strong></td>
+	  <td>₱<?= number_format($tax, 2) ?></td>
+	</tr>
+	<tr>
+	  <td colspan="3"><strong>Grand Total</strong></td>
+	  <td><strong>₱<?= number_format($grand_total, 2) ?></strong></td>
+	</tr>
   </table>
 </div>
 <div class="button-container">

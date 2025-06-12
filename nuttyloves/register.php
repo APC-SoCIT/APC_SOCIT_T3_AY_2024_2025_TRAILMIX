@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password']);
     $address  = trim($_POST['address']);
 
-    $check = $conn->prepare("SELECT * FROM customers WHERE Email = ?");
+    $check = $conn->prepare("SELECT * FROM users WHERE Email = ?");
     $check->bind_param("s", $email);
     $check->execute();
     $result = $check->get_result();
@@ -19,8 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows > 0) {
         $error = "Email is already registered.";
     } else {
-        $stmt = $conn->prepare("INSERT INTO customers (Name, Email, Password, Address) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $name, $email, $password, $address);
+        $stmt = $conn->prepare("INSERT INTO users (Name, Email, Password, Address, Role, Verified) VALUES (?, ?, ?, ?, 'customer', 0)");
+		$stmt->bind_param("ssss", $name, $email, $password, $address);
+
         if ($stmt->execute()) {
             $success = "Account created successfully. Redirecting to login...";
             header("refresh:2;url=login.php");

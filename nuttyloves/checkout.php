@@ -7,12 +7,12 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$customer_id = 1;
+$user_id = 1;
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
 }
-$customer_id = $_SESSION['user']['CustomerID'];
+$user_id = $_SESSION['user']['UserID'];
 if (empty($_SESSION['cart'])) {
     header('Location: cart.php');
     exit();
@@ -34,7 +34,7 @@ while ($row = $result->fetch_assoc()) {
     $total += $row['Price'] * $qty;
 }
 
-$order_sql = "INSERT INTO orders (CustomerID, TotalAmount) VALUES ($customer_id, $total)";
+$order_sql = "INSERT INTO orders (UserID, TotalAmount) VALUES ($user_id, $total)";
 if (!$conn->query($order_sql)) {
     die("Order insert failed: " . $conn->error);
 }
