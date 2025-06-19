@@ -84,6 +84,8 @@ session_start();
     <a href="index.php">Home</a>
     <a href="shop.php">Shop</a>
     <a href="cart.php">Cart</a>
+	<a href="my_orders.php">My Orders</a>
+	<a href="account_settings.php">My Account</a>
   </div>
   <div class="nav-right">
     <?php if (isset($_SESSION['user'])): ?>

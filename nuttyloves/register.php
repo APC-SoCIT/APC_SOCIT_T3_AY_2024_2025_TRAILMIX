@@ -133,6 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <a href="index.php">Home</a>
     <a href="shop.php">Shop</a>
     <a href="cart.php">Cart</a>
+	<a href="my_orders.php">My Orders</a>
+	<a href="account_settings.php">My Account</a>
     <a href="login.php">Login</a>
 </nav>
 

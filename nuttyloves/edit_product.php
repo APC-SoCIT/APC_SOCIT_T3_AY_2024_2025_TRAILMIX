@@ -7,23 +7,47 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
     exit();
 }
 
-$id = intval($_GET['id']);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
-    $desc = $_POST['description'];
-    $price = floatval($_POST['price']);
-    $stock = intval($_POST['stock']);
-
-    $stmt = $conn->prepare("UPDATE products SET Name=?, Description=?, Price=?, StockQuantity=? WHERE ProductID=?");
-    $stmt->bind_param("ssdii", $name, $desc, $price, $stock, $id);
-    $stmt->execute();
-
-    header("Location: admin_manage_products.php");
+$id = intval($_GET['id'] ?? 0);
+$product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_assoc();
+if (!$product) {
+    header("Location: admin_manage_products.php?error=notfound");
     exit();
 }
 
-$product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_assoc();
+$errorMsg = '';
+if (isset($_GET['error'])) {
+    if ($_GET['error'] === 'negative_stock') {
+        $errorMsg = "❌ Stock quantity cannot be negative.";
+    } elseif ($_GET['error'] === 'invalid_price') {
+        $errorMsg = "❌ Price must be greater than 0.";
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name  = trim($_POST['name']);
+    $desc  = trim($_POST['description']);
+    $price = floatval($_POST['price']);
+    $stock = intval($_POST['stock']);
+
+    if ($stock < 0) {
+        header("Location: edit_product.php?id=$id&error=negative_stock");
+        exit();
+    }
+
+    if ($price <= 0) {
+        header("Location: edit_product.php?id=$id&error=invalid_price");
+        exit();
+    }
+
+    $stmt = $conn->prepare(
+        "UPDATE products SET Name = ?, Description = ?, Price = ?, StockQuantity = ? WHERE ProductID = ?"
+    );
+    $stmt->bind_param("ssdii", $name, $desc, $price, $stock, $id);
+    $stmt->execute();
+
+    header("Location: admin_manage_products.php?success=updated");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,8 +58,8 @@ $product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_a
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
     header, footer { background: #2e7d32; color: white; padding: 15px; text-align: center; }
-    nav { background: #c62828; display: flex; justify-content: center; padding: 10px; }
-    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    nav { background: #c62828; display: flex; justify-content: center; padding: 10px; flex-wrap: wrap; }
+    nav a { color: white; margin: 6px 12px; text-decoration: none; font-weight: bold; }
     nav a:hover { text-decoration: underline; }
 
     .container {
@@ -95,7 +119,6 @@ $product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_a
     }
 
     .back-link {
-      display: block;
       text-align: center;
       margin-top: 15px;
     }
@@ -109,6 +132,13 @@ $product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_a
     .back-link a:hover {
       text-decoration: underline;
     }
+
+    .msg {
+      text-align: center;
+      font-weight: bold;
+      color: #c62828;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -119,15 +149,26 @@ $product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_a
 
 <nav>
   <a href="admin_dashboard.php">Dashboard</a>
+  <a href="admin_low_stock_alerts.php">Low Stock Alerts</a>
   <a href="admin_manage_products.php">Products</a>
   <a href="admin_manage_inventory.php">Inventory</a>
+  <a href="admin_manage_ingredients.php">Ingredients</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
+  <a href="admin_sales_chart.php">Reports</a>
+  <a href="admin_verify_users.php">Verify Users</a>
+  <a href="admin_grant_admin.php">Grant Admin</a>
+  <a href="admin_edit_account.php">My Account</a>
   <a href="logout.php">Logout</a>
 </nav>
 
 <div class="container">
-  <h2>✏️ Edit Product</h2>
+  <h2>Edit Product</h2>
+
+  <?php if ($errorMsg): ?>
+    <div class="msg"><?= $errorMsg ?></div>
+  <?php endif; ?>
+
   <form method="post">
     <label for="name">Product Name</label>
     <input type="text" id="name" name="name" value="<?= htmlspecialchars($product['Name']) ?>" required>
@@ -136,10 +177,10 @@ $product = $conn->query("SELECT * FROM products WHERE ProductID = $id")->fetch_a
     <textarea id="description" name="description" required><?= htmlspecialchars($product['Description']) ?></textarea>
 
     <label for="price">Price (₱)</label>
-    <input type="number" id="price" name="price" step="0.01" value="<?= $product['Price'] ?>" required>
+    <input type="number" id="price" name="price" step="0.01" min="0.01" value="<?= $product['Price'] ?>" required>
 
     <label for="stock">Stock Quantity</label>
-    <input type="number" id="stock" name="stock" value="<?= $product['StockQuantity'] ?>" required>
+    <input type="number" id="stock" name="stock" min="0" value="<?= $product['StockQuantity'] ?>" required>
 
     <button type="submit">Update Product</button>
   </form>

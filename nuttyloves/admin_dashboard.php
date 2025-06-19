@@ -1,5 +1,4 @@
 <?php
-// admin_dashboard.php
 session_start();
 if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
     header("Location: login.php");
@@ -31,24 +30,31 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
 
 <nav>
   <a href="admin_dashboard.php">Dashboard</a>
+  <a href="admin_low_stock_alerts.php">Low Stock Alerts</a>
   <a href="admin_manage_products.php">Products</a>
   <a href="admin_manage_inventory.php">Inventory</a>
+  <a href="admin_manage_ingredients.php">Ingredients</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
   <a href="admin_sales_chart.php">Reports</a>
   <a href="admin_verify_users.php">Verify Users</a>
+  <a href="admin_grant_admin.php">Grant Admin</a>
+  <a href="admin_edit_account.php">My Account</a>
   <a href="logout.php">Logout</a>
 </nav>
 
 <div class="container">
   <h2>Admin Functions</h2>
   <div class="admin-links">
+	<a href="admin_low_stock_alerts.php">Manage Low Stock</a>
     <a href="admin_manage_products.php">Manage Products</a>
     <a href="admin_manage_inventory.php">Manage Inventory</a>
+    <a href="admin_manage_ingredients.php">Manage Ingredients</a>
     <a href="admin_manage_orders.php">Manage Orders</a>
     <a href="admin_view_sales.php">View Sales List</a>
 	<a href="admin_sales_chart.php">View Sales Reports</a>
-	<a href="admin_verify_users.php">Verify Users</a>
+	<a href="admin_verify_users.php">Manage Verification</a>
+	<a href="admin_grant_admin.php">Manage Administration</a>
   </div>
 </div>
 

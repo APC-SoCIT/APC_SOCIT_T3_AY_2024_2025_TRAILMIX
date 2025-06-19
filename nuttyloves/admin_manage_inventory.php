@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 include 'config.php';
 
 require __DIR__ . '/phpmailer/src/Exception.php';
@@ -12,6 +13,10 @@ use PHPMailer\PHPMailer\Exception;
 if (!isset($_SESSION['user']) || $_SESSION['user']['Role'] !== 'admin') {
     header("Location: login.php");
     exit();
+}
+if (isset($_GET['error']) && $_GET['error'] === 'lowstock') {
+    $ingredient = htmlspecialchars($_GET['item']);
+    echo "<script>alert('⚠️ Cannot increase product stock. Not enough of the ingredient: $ingredient');</script>";
 }
 
 $lowStockItems = [];
@@ -38,7 +43,7 @@ if (!empty($lowStockItems)) {
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom('francisconjd@gmail.com', 'NuttyLoves');
+        $mail->setFrom('francisconjd.csa@gmail.com', 'NuttyLoves');
         $mail->addAddress('your-email@gmail.com', 'Admin');
 
         $mail->isHTML(true);
@@ -86,12 +91,16 @@ if (!empty($lowStockItems)) {
 
 <nav>
   <a href="admin_dashboard.php">Dashboard</a>
+  <a href="admin_low_stock_alerts.php">Low Stock Alerts</a>
   <a href="admin_manage_products.php">Products</a>
   <a href="admin_manage_inventory.php">Inventory</a>
+  <a href="admin_manage_ingredients.php">Ingredients</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
   <a href="admin_sales_chart.php">Reports</a>
   <a href="admin_verify_users.php">Verify Users</a>
+  <a href="admin_grant_admin.php">Grant Admin</a>
+  <a href="admin_edit_account.php">My Account</a>
   <a href="logout.php">Logout</a>
 </nav>
 

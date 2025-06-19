@@ -25,28 +25,26 @@ include 'config.php';
       text-align: center;
       color: white;
     }
-	nav {
-	  background-color: #c62828;
-	  display: flex;
-	  justify-content: center;
-	  align-items: center;
-	  padding: 10px;
-	  position: relative;
-	}
-
-	.nav-center {
-	  display: flex;
-	  gap: 15px;
-	}
-
-	.nav-right {
-	  position: absolute;
-	  right: 15px;
-	  display: flex;
-	  align-items: center;
-	  gap: 10px;
-	}
-		nav a {
+    nav {
+      background-color: #c62828;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      position: relative;
+    }
+    .nav-center {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-right {
+      position: absolute;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav a {
       color: white;
       margin: 0 15px;
       text-decoration: none;
@@ -108,6 +106,11 @@ include 'config.php';
       color: white;
       margin-top: 40px;
     }
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +125,8 @@ include 'config.php';
     <a href="index.php">Home</a>
     <a href="shop.php">Shop</a>
     <a href="cart.php">Cart</a>
+    <a href="my_orders.php">My Orders</a>
+    <a href="account_settings.php">My Account</a>
   </div>
   <div class="nav-right">
     <?php if (isset($_SESSION['user'])): ?>
@@ -153,59 +158,52 @@ include 'config.php';
 
     while ($row = $result->fetch_assoc()) {
       $qty = $_SESSION['cart'][$row['ProductID']];
-      $subtotal = $row['Price'] * $qty;
+      $price = $row['Price'];
+      $subtotal = $price * $qty;
       $total += $subtotal;
-	  $tax = $total * 0.12;
-	  $grand_total = $total + $tax;
 
       echo "<tr>
-              <td>{$row['Name']}</td>
-              <td>₱" . number_format($row['Price'], 2) . "</td>
+              <td>" . htmlspecialchars($row['Name']) . "</td>
+              <td>₱" . number_format($price, 2) . "</td>
               <td>
-				<a href='update_cart.php?action=decrease&product_id={$row['ProductID']}' style='padding:4px 10px; background:#b71c1c; color:#fff; text-decoration:none; border-radius:4px;'>−</a>
-				$qty
-				<a href='update_cart.php?action=increase&product_id={$row['ProductID']}' style='padding:4px 10px; background:#2e7d32; color:#fff; text-decoration:none; border-radius:4px;'>+</a>
-				<br>
-				<a href='update_cart.php?action=remove&product_id={$row['ProductID']}' style='color:#c62828; font-size: 0.9em;'>Remove</a>
-				</td>
-
+                <form method='post' action='update_cart.php' style='display:inline-block;'>
+                  <input type='hidden' name='product_id' value='{$row['ProductID']}'>
+                  <input type='number' name='quantity' value='{$qty}' min='1'>
+                  <button type='submit' class='btn' style='padding:4px 10px;font-size:0.9em;'>Update</button>
+                </form>
+                <br>
+                <a href='update_cart.php?action=remove&product_id={$row['ProductID']}' style='color:#c62828;font-size:0.9em;'>Remove</a>
+              </td>
               <td>₱" . number_format($subtotal, 2) . "</td>
             </tr>";
     }
 
-    echo "<tr>
-            <td colspan='3' class='total'>Subtotal</td>
-            <td class='total'>₱" . number_format($total, 2) . "</td>
-          </tr>";
-		  
-	    echo "<tr>
-            <td colspan='3' class='total'>Tax (12%)</td>
-            <td class='total'>₱" . number_format($tax, 2) . "</td>
-          </tr>";
-		echo "<tr>
-            <td colspan='3' class='total'>Grand Total</td>
-            <td class='total'>₱" . number_format($grand_total, 2) . "</td>
-          </tr>";
-	
+    $tax = $total * 0.12;
+    $grand_total = $total + $tax;
+
+    echo "<tr><td colspan='3' class='total'>Subtotal</td>
+              <td class='total'>₱" . number_format($total, 2) . "</td></tr>";
+    echo "<tr><td colspan='3' class='total'>Tax (12%)</td>
+              <td class='total'>₱" . number_format($tax, 2) . "</td></tr>";
+    echo "<tr><td colspan='3' class='total'><strong>Grand Total</strong></td>
+              <td class='total'><strong>₱" . number_format($grand_total, 2) . "</strong></td></tr>";
     echo "</table>";
-	
   }
   ?>
 </div>
+
 <?php if (isset($_SESSION['user'])): ?>
   <form action="checkout.php" method="post">
     <div style="text-align: center; margin-top: 20px;">
-      <button type="submit" class="btn">🛒 Checkout Now</button>
+      <button type="submit" class="btn">Checkout Now</button>
     </div>
   </form>
 <?php else: ?>
   <div style="text-align: center; margin-top: 20px;">
     <p><strong>Please log in to proceed with checkout.</strong></p>
-    <a href="login.php" class="btn">🔐 Login to Checkout</a>
+    <a href="login.php" class="btn">Login to Checkout</a>
   </div>
 <?php endif; ?>
-
-
 
 <footer>
   &copy; <?= date('Y') ?> NuttyLoves. All rights reserved.

@@ -117,15 +117,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <nav>
   <a href="admin_dashboard.php">Dashboard</a>
+  <a href="admin_low_stock_alerts.php">Low Stock Alerts</a>
   <a href="admin_manage_products.php">Products</a>
   <a href="admin_manage_inventory.php">Inventory</a>
+  <a href="admin_manage_ingredients.php">Ingredients</a>
   <a href="admin_manage_orders.php">Orders</a>
   <a href="admin_view_sales.php">Sales</a>
+  <a href="admin_sales_chart.php">Reports</a>
+  <a href="admin_verify_users.php">Verify Users</a>
+  <a href="admin_grant_admin.php">Grant Admin</a>
+  <a href="admin_edit_account.php">My Account</a>
   <a href="logout.php">Logout</a>
 </nav>
 
 <div class="container">
-  <h2>➕ Add New Product</h2>
+  <h2>Add New Product</h2>
   <form method="post">
     <label for="name">Product Name</label>
     <input type="text" id="name" name="name" required>
